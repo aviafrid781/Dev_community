@@ -7,9 +7,7 @@ import { Skills, SkillsDocument } from './schema/skills.schema';
 
 @Injectable()
 export class SkillsService {
-    findByIdAndUpdate(id: string, SkillsDocument: SkillsDocument) {
-        throw new Error('Method not implemented.');
-    }
+   
     constructor(
         @InjectModel(Skills.name)
         private skillsModel: Model<Document>,
@@ -43,7 +41,7 @@ export class SkillsService {
         return this.skillsModel.findByIdAndUpdate(id, SkillsDocument);
         }
         else{
-            
+
             throw new UnauthorizedException(
                 'Sorry!! You are not Developer',
             );

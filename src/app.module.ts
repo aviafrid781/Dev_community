@@ -4,6 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { SkillsModule } from './skills/skills.module';
+import { PostModule } from './post/post.module';
+import { CommentModule } from './comment/comment.module';
 //developer
 //XWFf5M5Q0evox2mr
 @Module({
@@ -15,6 +17,10 @@ import { SkillsModule } from './skills/skills.module';
     UserModule,
 
     SkillsModule,
+
+    PostModule,
+
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
