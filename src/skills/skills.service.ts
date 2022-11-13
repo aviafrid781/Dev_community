@@ -17,8 +17,8 @@ export class SkillsService {
         
         ,user: UserI
     ) {
-        this.logger.log("kire:",user);
-        this.logger.log(createSkillsDto.expertises);
+        this.logger.log(user);
+    
         if (user.userType == 'developer') {
             const skills = {
                 skillsName: createSkillsDto.skillsName ? createSkillsDto.skillsName : "",

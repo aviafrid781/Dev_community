@@ -32,10 +32,14 @@ export class UserService {
       };
 
       const createdUser = await this.userModel.create(user);
+
       const payload: JwtPayload = { email: createUserDto.email };
       const accessToken: string = await this.jwtService.sign(payload);
+      const refreshToken: string = await this.jwtService.sign(payload);
+
       const userObj = createdUser.toObject();
       delete userObj.password;
+
       return { createdUser: userObj, accessToken: accessToken };
     } else {
       throw new UnauthorizedException('your email is already used');
