@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { JwtPayload } from './jwt-payload.interface';
 import { User, UserDocument } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -33,7 +34,6 @@ export class UserService {
       const createdUser = await this.userModel.create(user);
       const payload: JwtPayload = { email: createUserDto.email };
       const accessToken: string = await this.jwtService.sign(payload);
-
       const userObj = createdUser.toObject();
       delete userObj.password;
       return { createdUser: userObj, accessToken: accessToken };
@@ -42,13 +42,13 @@ export class UserService {
     }
   }
 
+
   async signIn(email: string, password: string) {
+
     const user = await this.userModel.findOne({ email });
 
-    if (
-      email === user.email &&
-      (await bcrypt.compare(password, user.password))
-    ) {
+    if (email === user.email && (await bcrypt.compare(password, user.password)))
+   {
       const payload: JwtPayload = { email };
       const accessToken: string = await this.jwtService.sign(payload);
 
@@ -56,7 +56,9 @@ export class UserService {
       delete userObj.password;
 
       return { user: userObj, accessToken: accessToken };
-    } else {
+    } 
+    
+  else {
       throw new UnauthorizedException('user not found');
     }
   }

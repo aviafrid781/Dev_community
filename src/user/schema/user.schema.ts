@@ -31,6 +31,9 @@ export class User {
     enum: [UserType.NormalUser, UserType.Developer],
   })
   userType: string;
+  
+  @Prop()
+  refreshToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

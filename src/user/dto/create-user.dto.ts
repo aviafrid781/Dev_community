@@ -12,4 +12,6 @@ export class CreateUserDto {
   readonly address: string;
   @IsNotEmpty()
   readonly userType: string;
+  @IsNotEmpty()
+  readonly  refreshToken: string;
 }
