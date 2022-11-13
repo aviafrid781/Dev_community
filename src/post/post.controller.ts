@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
@@ -19,5 +19,10 @@ export class PostController {
             createPostDto,
             user
         );
+    }
+    @Get()
+    @UseGuards(AuthGuard('jwt'))
+    getAllPost(@GetUser() user: UserI) {
+      return this.postService.getAllPost(user);
     }
 }

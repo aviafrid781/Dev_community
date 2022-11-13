@@ -34,4 +34,17 @@ export class PostService {
             );
         }
     }
+    async  getAllPost(user: UserI) {
+        if (user.userType == 'developer') {
+          const posts = await this.postModel
+            .find()
+            .populate('userId');
+    
+          return posts;
+        } else {
+          throw new UnauthorizedException(
+            'You are not Developer!!',
+          );
+        }
+      }
 }

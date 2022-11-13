@@ -34,4 +34,18 @@ export class CommentService {
             );
         }
     }
+    async  getAllComment(user: UserI) {
+        if (user.userType == 'developer') {
+          const comment = await this.commentModel
+            .find()
+            .populate('postId')
+            .populate('userId');
+    
+          return comment;
+        } else {
+          throw new UnauthorizedException(
+            'You are not Developer!!',
+          );
+        }
+      }
 }

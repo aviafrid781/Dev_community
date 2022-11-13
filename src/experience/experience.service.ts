@@ -48,4 +48,18 @@ export class ExperienceService {
             );
         }
     }
+
+    async  getAllExperienceDeveloper(user: UserI) {
+        if (user.userType == 'developer') {
+          const experience = await this.experienceModel
+            .find()
+            .populate('userId');
+    
+          return experience;
+        } else {
+          throw new UnauthorizedException(
+            'You are not Developer!!',
+          );
+        }
+      }
 }

@@ -35,7 +35,7 @@ export class SkillsService {
             );
         }
     }
-    async update(id: string, skillsDocument: SkillsDocument,user:UserI) {
+    async updateSkills(id: string, skillsDocument: SkillsDocument,user:UserI) {
 
         if (user.userType == 'developer') {
         return this.skillsModel.findByIdAndUpdate(id, skillsDocument);
@@ -47,6 +47,19 @@ export class SkillsService {
             );
         }
     }
+    async  getUserskills(user: UserI) {
+        if (user.userType == 'developer') {
+          const skills = await this.skillsModel
+            .find()
+            .populate('userId');
+    
+          return skills;
+        } else {
+          throw new UnauthorizedException(
+            'You are not Developer!!',
+          );
+        }
+      }
 
 
 

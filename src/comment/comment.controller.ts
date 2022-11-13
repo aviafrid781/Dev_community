@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
@@ -18,5 +18,11 @@ export class CommentController {
             createCommentDto,
             user
         );
+    }
+
+    @Get()
+    @UseGuards(AuthGuard('jwt'))
+    getAllComment(@GetUser() user: UserI) {
+      return this.commentService.getAllComment(user);
     }
 }
