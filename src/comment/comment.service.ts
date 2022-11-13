@@ -9,25 +9,25 @@ import { Comment } from './schema/comment.schema';
 export class CommentService {
     constructor(
         @InjectModel(Comment.name)
-        private postModel: Model<Document>,
+        private commentModel: Model<Document>,
         private readonly logger: Logger,
     ) { }
-
-    async createPost(createCommentDto: CreateCommentDto
+   
+    async createComment(createCommentDto: CreateCommentDto
 
         , user: UserI
     ) {
         this.logger.log(user);
         if (user.userType == 'developer') {
-            const post = {
+            const comment = {
                 comment: createCommentDto.comment ? createCommentDto.comment : "",
-                
+                postId: createCommentDto.postId ? createCommentDto.postId : "",
                 userId: user._id ? user._id : "",
 
             };
-            const createdPost = await this.postModel.create(post);
+            const createdComment = await this.commentModel.create(comment);
 
-            return createdPost;
+            return createdComment;
         } else {
             throw new UnauthorizedException(
                 'Sorry!! You are not Developer',

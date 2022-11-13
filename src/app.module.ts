@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { SkillsModule } from './skills/skills.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
+import { ExperienceModule } from './experience/experience.module';
 //developer
 //XWFf5M5Q0evox2mr
 @Module({
@@ -21,6 +22,8 @@ import { CommentModule } from './comment/comment.module';
     PostModule,
 
     CommentModule,
+
+    ExperienceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

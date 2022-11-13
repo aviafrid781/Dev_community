@@ -11,9 +11,9 @@ export class Skills {
   skillsName: string;
 
   @Prop({
-    type: Number,
+    type: String,
   })
-  experience: number;
+  expertises: string;
 
    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
    userId: User;
