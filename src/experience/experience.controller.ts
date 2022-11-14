@@ -15,7 +15,7 @@ export class ExperienceController {
     async createExperience(
         @Body() createExperienceDto: CreateExperienceDto, @GetUser() user: UserI,
     ) {
-        return await this.experienceService.createExperience(
+        return await this.experienceService.create(
             createExperienceDto,
             user
         );
@@ -24,8 +24,8 @@ export class ExperienceController {
 
     @Put(':id')
     @UseGuards(AuthGuard('jwt'))
-    updateExperience(@Param('id') id: string, @Body('') experienceDocument: ExperienceDocument, @GetUser() user: UserI) {
-        return this.experienceService.updateExperience(id,experienceDocument,user);
+    updateById(@Param('id') id: string, @Body('') experienceDocument: ExperienceDocument, @GetUser() user: UserI) {
+        return this.experienceService.updateById(id, experienceDocument, user);
     }
     @Get()
     @UseGuards(AuthGuard('jwt'))

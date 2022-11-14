@@ -3,7 +3,7 @@ export class CreateSkillsDto {
   @IsNotEmpty()
   readonly skillsName: string;
   @IsNotEmpty()
-  readonly expertises: string;
+  readonly expertise: string;
   @IsNotEmpty()
   readonly userId: string;
 }

@@ -1,40 +1,47 @@
-import { Injectable, Logger, Post, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreatePostDto } from './dto/create-post.dto';
-import {  Posts } from './schema/post.schema';
-
+import { Posts } from './schema/post.schema';
+import * as mongoose from 'mongoose';
 @Injectable()
 export class PostService {
-    constructor(
-        @InjectModel(Posts.name)
-        private postModel: Model<Document>,
-        private readonly logger: Logger,
-    ) { }
+  constructor(
+    @InjectModel(Posts.name)
+    private postModel: Model<Document>,
+    private readonly logger: Logger,
+  ) { }
 
-    async createPost(createPostDto: CreatePostDto
+  async create(createPostDto: CreatePostDto
 
-        , user: UserI
-    ) {
-        this.logger.log(user);
-        if (user.userType == 'developer') {
-            const post = {
-                title: createPostDto.title ? createPostDto.title : "",
-                description: createPostDto.description ? createPostDto.description : "",
-                userId: user._id ? user._id : "",
+    , user: UserI
+  ): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }> {
+    this.logger.log(user);
+    if (user.userType == 'developer') {
+      const post = this.insertPost(createPostDto, user);
+      const createPost = await this.postModel.create(post);
 
-            };
-            const createdPost = await this.postModel.create(post);
-
-            return createdPost;
-        } else {
-            throw new UnauthorizedException(
-                'Sorry!! You are not Developer',
-            );
-        }
+      return createPost;
+    } else {
+      throw new UnauthorizedException({
+        massage:
+          'Sorry!! You are not Developer'
+      }
+      );
     }
-  async getPosts(user: UserI, page: number, count: number) {
+  }
+
+
+  private insertPost(createPostDto: CreatePostDto, user: UserI): { title: string; description: string; userId: any; } {
+    return {
+      title: createPostDto.title ? createPostDto.title : "",
+      description: createPostDto.description ? createPostDto.description : "",
+      userId: user._id ? user._id : "",
+    };
+  }
+
+  async getPosts(user: UserI, page: number, count: number): Promise<{ data: any[]; count: any; }> {
 
     if (user.userType == 'developer') {
       const aggregate = [];
@@ -70,8 +77,10 @@ export class PostService {
       return { data: data, count: total[0] ? total[0].count : 0 }
     }
     else {
-      throw new UnauthorizedException(
-        'you can not see posts!!You are not Developer',
+      throw new UnauthorizedException({
+        massage:
+          'you can not see posts!!You are not Developer'
+      }
       );
     }
   }

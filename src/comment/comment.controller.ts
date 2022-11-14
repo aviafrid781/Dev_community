@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
@@ -11,10 +11,10 @@ export class CommentController {
 
     @Post()
     @UseGuards(AuthGuard('jwt'))
-    async createComment(
+    async create(
         @Body() createCommentDto: CreateCommentDto, @GetUser() user: UserI,
     ) {
-        return await this. commentService.createComment(
+        return await this. commentService.create(
             createCommentDto,
             user
         );
@@ -24,7 +24,7 @@ export class CommentController {
 
     @Get()
     @UseGuards(AuthGuard('jwt'))
-    getComment(@GetUser() user: UserI, @Query('page') page: number, @Query('count') count: number) {
-        return this.commentService.getComment(user, page, count);
+    getComment(@Query('id') id: string, @GetUser() user: UserI, @Query('page') page: number, @Query('count') count: number) {
+        return this.commentService.getComment(id,user, page, count);
     }
 }

@@ -12,10 +12,10 @@ export class SkillsController {
 
     @Post()
     @UseGuards(AuthGuard('jwt'))
-    async createSkills(
+    async create(
         @Body() createSkillsDto: CreateSkillsDto, @GetUser() user: UserI,
     ) {
-        return await this.skillsService.createSkills(
+        return await this.skillsService.create(
             createSkillsDto,
             user
         );
@@ -23,8 +23,8 @@ export class SkillsController {
 
     @Put(':id')
     @UseGuards(AuthGuard('jwt'))
-    updateSkills(@Param('id') id: string, @Body('') SkillsDocument: SkillsDocument, @GetUser() user: UserI) {
-        return this.skillsService.updateSkills(id, SkillsDocument,user);
+    updateById(@Param('id') id: string, @Body('') SkillsDocument: SkillsDocument, @GetUser() user: UserI) {
+        return this.skillsService.updateById(id, SkillsDocument,user);
     }
     
     @Get()

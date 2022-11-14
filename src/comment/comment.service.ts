@@ -1,10 +1,10 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
 import { Model } from 'mongoose';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Comment } from './schema/comment.schema';
-
 @Injectable()
 export class CommentService {
     constructor(
@@ -13,33 +13,39 @@ export class CommentService {
         private readonly logger: Logger,
     ) { }
 
-    async createComment(createCommentDto: CreateCommentDto
-
+    async create(createCommentDto: CreateCommentDto
         , user: UserI
-    ) {
-        this.logger.log(user);
+    ): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }> {
         if (user.userType == 'developer') {
-            const comment = {
-                comment: createCommentDto.comment ? createCommentDto.comment : "",
-                postId: createCommentDto.postId ? createCommentDto.postId : "",
-                userId: user._id ? user._id : "",
-
-            };
+            const comment = this.insertComment(createCommentDto, user);
             const createdComment = await this.commentModel.create(comment);
 
             return createdComment;
         } else {
-            throw new UnauthorizedException(
-                'Sorry!! You are not Developer',
+            throw new UnauthorizedException({
+                massage:
+                    'Sorry!! You are not Developer'
+            }
             );
         }
     }
 
+    private insertComment(createCommentDto: CreateCommentDto, user: UserI): { comment: string; postId: string; userId: any; } {
+        return {
+            comment: createCommentDto.comment ? createCommentDto.comment : "",
+            postId: createCommentDto.postId ? createCommentDto.postId : "",
+            userId: user._id ? user._id : "",
+        };
+    }
 
-    async getComment(user: UserI, page: number, count: number) {
+    async getComment(id: string, user: UserI, page: number, count: number): Promise<{ data: any[]; count: any; }> {
 
         if (user.userType == 'developer') {
             const aggregate = [];
+
+            aggregate.push(
+                { $match: { userId: new mongoose.Types.ObjectId(id) } }
+            )
 
             aggregate.push(
                 {
@@ -49,8 +55,7 @@ export class CommentService {
                         localField: "userId",
                         foreignField: "_id",
                         as: "users"
-
-                    }
+                    },
                 }
             )
             aggregate.push(
@@ -61,7 +66,6 @@ export class CommentService {
                     }
                 }
             )
-
             aggregate.push(
                 {
                     $lookup:
@@ -70,7 +74,6 @@ export class CommentService {
                         localField: "postId",
                         foreignField: "_id",
                         as: "posts"
-
                     }
                 }
             )
@@ -88,13 +91,16 @@ export class CommentService {
             aggregate.push({ $skip: (page - 1) * count });
             aggregate.push({ $limit: count * 1 });
             const data = await this.commentModel.aggregate(aggregate).exec()
-
             return { data: data, count: total[0] ? total[0].count : 0 }
         }
         else {
-            throw new UnauthorizedException(
-                'you can not see comments!!You are not Developer',
+            throw new UnauthorizedException({
+                massage:
+                    'you can not see comments!!You are not Developer'
+            }
             );
+
+
         }
     }
 

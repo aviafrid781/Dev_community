@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 export interface SkillsI extends Document {
   skillsName: string;
-  expertises: string;
+  expertise: string;
   userId: string;
 }

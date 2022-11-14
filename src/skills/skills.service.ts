@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateSkillsDto } from './dto/create-skills.dto';
 import { Skills, SkillsDocument } from './schema/skills.schema';
-
+import * as mongoose from 'mongoose';
 @Injectable()
 export class SkillsService {
     constructor(
@@ -13,41 +13,42 @@ export class SkillsService {
         private readonly logger: Logger,
     ) { }
 
-    async createSkills(createSkillsDto:CreateSkillsDto
-        
-        ,user: UserI
-    ) {
-        this.logger.log(user);
-    
+    async create(createSkillsDto: CreateSkillsDto, user: UserI): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: mongoose.Types.ObjectId; }>
+    {
         if (user.userType == 'developer') {
-            const skills = {
-                skillsName: createSkillsDto.skillsName ? createSkillsDto.skillsName : "",
-                expertises:createSkillsDto.expertises ? createSkillsDto.expertises : "",
-                userId: user._id ? user._id : "",
-              
-            };
-            const createdSkills = await this.skillsModel.create(skills);
+            const userSkills = this.insertSkills(createSkillsDto, user);
+            const Skills = await this.skillsModel.create(userSkills);
 
-            return createdSkills;
+            return Skills;
         } else {
-            throw new UnauthorizedException(
-                'Sorry!! You are not Developer',
+            throw new UnauthorizedException({
+                massage:
+                'Sorry!! You are not Developer'}
             );
         }
     }
-    async updateSkills(id: string, skillsDocument: SkillsDocument,user:UserI) {
+    private insertSkills(createSkillsDto: CreateSkillsDto, user: UserI): { skillsName: string; expertise: string; userId: any; } {
+        return {
+            skillsName: createSkillsDto.skillsName ? createSkillsDto.skillsName : "",
+            expertise: createSkillsDto.expertise ? createSkillsDto.expertise : "",
+            userId: user._id ? user._id : "",
+        };
+    }
+
+    async updateById(id: string, skillsDocument: SkillsDocument, user: UserI): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }> {
 
         if (user.userType == 'developer') {
-        return this.skillsModel.findByIdAndUpdate(id, skillsDocument);
+            return this.skillsModel.findByIdAndUpdate(id, skillsDocument);
         }
-        else{
+        else {
 
-            throw new UnauthorizedException(
-                'Sorry!! You are not Developer',
+            throw new UnauthorizedException({
+                massage:
+                'Sorry!! You are not Developer'}
             );
         }
     }
-    async getSkills(user: UserI, page: number, count: number) {
+    async getSkills(user: UserI, page: number, count: number): Promise<{ data: any[]; count: any; }> {
 
         if (user.userType == 'developer') {
             const aggregate = [];
@@ -83,8 +84,9 @@ export class SkillsService {
             return { data: data, count: total[0] ? total[0].count : 0 }
         }
         else {
-            throw new UnauthorizedException(
-                'you can not see skills!!You are not Developer',
+            throw new UnauthorizedException({
+                massage:
+                'you can not see skills!!You are not Developer'}
             );
         }
     }

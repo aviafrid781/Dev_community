@@ -4,7 +4,6 @@ import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
-
 @Controller('posts')
 export class PostController {
 
@@ -12,10 +11,10 @@ export class PostController {
 
     @Post()
     @UseGuards(AuthGuard('jwt'))
-    async createPost(
+    async create(
         @Body() createPostDto: CreatePostDto, @GetUser() user: UserI,
     ) {
-        return await this.postService.createPost(
+        return await this.postService.create(
             createPostDto,
             user
         );
