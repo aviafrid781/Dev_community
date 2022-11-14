@@ -12,7 +12,7 @@ export class CommentService {
         private commentModel: Model<Document>,
         private readonly logger: Logger,
     ) { }
-   
+
     async createComment(createCommentDto: CreateCommentDto
 
         , user: UserI
@@ -34,18 +34,68 @@ export class CommentService {
             );
         }
     }
-    async  getAllComment(user: UserI) {
+
+
+    async getComment(user: UserI, page: number, count: number) {
+
         if (user.userType == 'developer') {
-          const comment = await this.commentModel
-            .find()
-            .populate('postId')
-            .populate('userId');
-    
-          return comment;
-        } else {
-          throw new UnauthorizedException(
-            'You are not Developer!!',
-          );
+            const aggregate = [];
+
+            aggregate.push(
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "users"
+
+                    }
+                }
+            )
+            aggregate.push(
+                {
+                    $unwind: {
+                        path: '$users',
+                        preserveNullAndEmptyArrays: true
+                    }
+                }
+            )
+
+            aggregate.push(
+                {
+                    $lookup:
+                    {
+                        from: "posts",
+                        localField: "postId",
+                        foreignField: "_id",
+                        as: "posts"
+
+                    }
+                }
+            )
+            aggregate.push(
+                {
+                    $unwind: {
+                        path: '$posts',
+                        preserveNullAndEmptyArrays: true
+                    }
+                }
+            )
+            aggregate.push({ $count: 'count' });
+            const total = await this.commentModel.aggregate(aggregate).exec()
+            aggregate.pop()
+            aggregate.push({ $skip: (page - 1) * count });
+            aggregate.push({ $limit: count * 1 });
+            const data = await this.commentModel.aggregate(aggregate).exec()
+
+            return { data: data, count: total[0] ? total[0].count : 0 }
         }
-      }
+        else {
+            throw new UnauthorizedException(
+                'you can not see comments!!You are not Developer',
+            );
+        }
+    }
+
 }

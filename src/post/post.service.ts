@@ -34,17 +34,45 @@ export class PostService {
             );
         }
     }
-    async  getAllPost(user: UserI) {
-        if (user.userType == 'developer') {
-          const posts = await this.postModel
-            .find()
-            .populate('userId');
-    
-          return posts;
-        } else {
-          throw new UnauthorizedException(
-            'You are not Developer!!',
-          );
+  async getPosts(user: UserI, page: number, count: number) {
+
+    if (user.userType == 'developer') {
+      const aggregate = [];
+
+      aggregate.push(
+        {
+          $lookup:
+          {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "users"
+
+          }
         }
-      }
+      )
+      aggregate.push(
+        {
+          $unwind: {
+            path: '$users',
+            preserveNullAndEmptyArrays: true
+          }
+        }
+      )
+
+      aggregate.push({ $count: 'count' });
+      const total = await this.postModel.aggregate(aggregate).exec()
+      aggregate.pop()
+      aggregate.push({ $skip: (page - 1) * count });
+      aggregate.push({ $limit: count * 1 });
+      const data = await this.postModel.aggregate(aggregate).exec()
+
+      return { data: data, count: total[0] ? total[0].count : 0 }
+    }
+    else {
+      throw new UnauthorizedException(
+        'you can not see posts!!You are not Developer',
+      );
+    }
+  }
 }

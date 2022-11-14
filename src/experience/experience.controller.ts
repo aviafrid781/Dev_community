@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
@@ -29,8 +29,8 @@ export class ExperienceController {
     }
     @Get()
     @UseGuards(AuthGuard('jwt'))
-    getAllExperienceDeveloper(@GetUser() user: UserI) {
-      return this.experienceService.getAllExperienceDeveloper(user);
+    getExperience(@GetUser() user: UserI, @Query('page') page: number, @Query('count') count: number) {
+        return this.experienceService.getExperience(user, page, count);
     }
 
 }

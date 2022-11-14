@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
@@ -26,9 +26,10 @@ export class SkillsController {
     updateSkills(@Param('id') id: string, @Body('') SkillsDocument: SkillsDocument, @GetUser() user: UserI) {
         return this.skillsService.updateSkills(id, SkillsDocument,user);
     }
+    
     @Get()
     @UseGuards(AuthGuard('jwt'))
-    getUserskills(@GetUser() user: UserI) {
-      return this.skillsService.getUserskills(user);
+    getSkills(@GetUser() user: UserI, @Query('page') page: number, @Query('count') count: number) {
+        return this.skillsService.getSkills(user, page, count);
     }
 }
