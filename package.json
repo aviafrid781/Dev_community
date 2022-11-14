@@ -21,9 +21,12 @@
     "start:prod": "node dist/main.js"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^8.5.0",
+    "@nestjs.pro/logger-elasticsearch": "^0.1.25",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/elasticsearch": "^9.0.0",
     "@nestjs/jwt": "^9.0.0",
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/passport": "^9.0.0",

@@ -7,14 +7,15 @@ import { SkillsModule } from './skills/skills.module';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { ExperienceModule } from './experience/experience.module';
-//developer
-//XWFf5M5Q0evox2mr
+import { ElasticsearchModule } from '@nestjs/elasticsearch/dist/elasticsearch.module';
+
 @Module({
   imports: [
+    
     MongooseModule.forRoot(
       `mongodb+srv://restaurant:6NXhRsDpLSjD2r9y@cluster0.tamfjg8.mongodb.net/?retryWrites=true&w=majority`,
     ),
-
+    
     UserModule,
 
     SkillsModule,
