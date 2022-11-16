@@ -8,6 +8,7 @@ import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { ExperienceModule } from './experience/experience.module';
 import { ElasticsearchModule } from '@nestjs/elasticsearch/dist/elasticsearch.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch/dist/elasticsearch.mo
     CommentModule,
 
     ExperienceModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
