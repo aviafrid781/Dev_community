@@ -6,7 +6,6 @@ export interface UserI extends Document {
   password: string;
   address: string;
   userType: string;
-  // refreshToken: string;
   created_at?: string;
   updated_at?: string;
 }

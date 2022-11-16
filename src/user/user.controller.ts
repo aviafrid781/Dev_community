@@ -1,22 +1,18 @@
 import {
   Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
+  Controller, Delete, Get, Param, Post, Put, Query,
   Req,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateUserDto } from './dto/create-user.dto';
+import { SearchUsersDto } from './dto/searchUser.dto';
 import { GetUser } from './get-user.decorator';
 import { UserI } from './interfaces/user.interface';
 import { UserService } from './user.service';
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   async createUser(
@@ -38,4 +34,21 @@ export class UserController {
   test(@Req() req, @GetUser() user: UserI) {
     return { message: 'User is authenticated', user: user };
   }
+
+  @Get('elastic')
+  async getUsersFromElasticSearch(@Query() queries: SearchUsersDto): Promise<{ data: any; count: any; }> {
+    return await this.userService.getUsersFromElasticSearch(queries);
+  }
+
+  @Put(':id')
+  updateById(@Param('id') id: string, @Body('') createUserDto:CreateUserDto ) {
+    return this.userService.updateById(id, createUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.userService.remove(id);
+  }
+
+
 }

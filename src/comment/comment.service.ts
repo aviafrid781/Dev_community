@@ -1,7 +1,7 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Comment } from './schema/comment.schema';

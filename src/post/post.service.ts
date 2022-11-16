@@ -1,6 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Posts } from './schema/post.schema';

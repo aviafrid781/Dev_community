@@ -1,6 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateSkillsDto } from './dto/create-skills.dto';
 import { Skills, SkillsDocument } from './schema/skills.schema';
@@ -13,7 +13,7 @@ export class SkillsService {
         private readonly logger: Logger,
     ) { }
 
-    async create(createSkillsDto: CreateSkillsDto, user: UserI): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: mongoose.Types.ObjectId; }>
+    async create(createSkillsDto: CreateSkillsDto, user: UserI)
     {
         if (user.userType == 'developer') {
             const userSkills = this.insertSkills(createSkillsDto, user);
@@ -35,7 +35,7 @@ export class SkillsService {
         };
     }
 
-    async updateById(id: string, skillsDocument: SkillsDocument, user: UserI): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }> {
+    async updateById(id: string, skillsDocument: SkillsDocument, user: UserI) {
 
         if (user.userType == 'developer') {
             return this.skillsModel.findByIdAndUpdate(id, skillsDocument);

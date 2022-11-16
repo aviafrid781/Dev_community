@@ -1,6 +1,6 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { Experience, ExperienceDocument } from './schema/experience.schema';
@@ -16,7 +16,7 @@ export class ExperienceService {
     async create(createPostDto: CreateExperienceDto
 
         , user: UserI
-    ): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: mongoose.Types.ObjectId; }> {
+    ) {
         this.logger.log(user);
         if (user.userType == 'developer') {
             const experience = this.insertExperience(createPostDto, user);
@@ -46,7 +46,7 @@ export class ExperienceService {
         };
     }
 
-    async updateById(id: string, experienceDocument: ExperienceDocument, user: UserI): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: mongoose.Types.ObjectId; }> {
+    async updateById(id: string, experienceDocument: ExperienceDocument, user: UserI) {
 
         if (user.userType == 'developer') {
             return this.experienceModel.findByIdAndUpdate(id, experienceDocument);
@@ -61,7 +61,7 @@ export class ExperienceService {
         }
     }
 
-    async getExperienceDeveloper(user: UserI): Promise<Omit<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }, never>[]> {
+    async getExperienceDeveloper(user: UserI){
         if (user.userType == 'developer') {
             const experience = await this.experienceModel
                 .find()
