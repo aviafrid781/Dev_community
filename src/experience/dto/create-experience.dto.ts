@@ -1,5 +1,6 @@
 import {IsNotEmpty } from 'class-validator';
 export class CreateExperienceDto {
+  
     @IsNotEmpty()
     readonly companyName: string;
     @IsNotEmpty()

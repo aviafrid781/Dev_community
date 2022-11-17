@@ -2,8 +2,10 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Document, Model } from 'mongoose';
+import { ElasticSearchHelper, IndexNames } from 'src/Helper/elastic.search.helper';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { SearchCommentDto } from './dto/search-comment.dto';
 import { Comment } from './schema/comment.schema';
 @Injectable()
 export class CommentService {
@@ -18,7 +20,13 @@ export class CommentService {
     ): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }> {
         if (user.userType == 'developer') {
             const comment = this.insertComment(createCommentDto, user);
+
             const createdComment = await this.commentModel.create(comment);
+            if (createdComment) {
+                const userObj = createdComment.toObject();
+                ElasticSearchHelper.index(IndexNames.comment, userObj)
+            }
+
 
             return createdComment;
         } else {
@@ -103,5 +111,92 @@ export class CommentService {
 
         }
     }
+
+
+    async getUsersFromElasticSearch(query: SearchCommentDto) {
+        const pageSize = parseInt(query.pageSize ?? '200');
+        const current = parseInt(query.current ?? '1');
+        const searchFilters = {
+            query: {
+                bool: {
+                    must: [],
+                    filter: [],
+                },
+            },
+            size: pageSize,
+            from: ((current - 1) * pageSize) | 0,
+        };
+
+        if (query.search) {
+            let queryStr = ElasticSearchHelper.getFixedQueryString(query.search)
+            searchFilters.query.bool.must.push({
+                query_string: {
+                    // query: `\"*${query?.search}*\"`,
+                    query: queryStr,
+                    fields: ['fname', 'lname'],
+                },
+            });
+        }
+
+        delete query.search;
+        delete query.current;
+        delete query.search;
+        delete query.pageSize;
+
+        let queryString = '';
+        const queryKeys = Object.keys(query);
+        for (let i = 0; i < queryKeys.length; i++) {
+            const splittedParts = (
+                '"' +
+                query[queryKeys[i]].split(',').join('" , "') +
+                '"'
+            )
+                .split(',')
+                .join(' OR ');
+
+            queryString += `${queryKeys[i]}:(${splittedParts})`;
+
+            if (i < queryKeys.length - 1) {
+                queryString += ' AND ';
+            }
+        }
+
+        if (queryString != '') {
+
+            searchFilters.query.bool.must.push({
+                query_string: {
+                    query: queryString,
+                },
+            });
+        }
+
+        const resp = await ElasticSearchHelper.search(
+            IndexNames.comment,
+            searchFilters,
+        );
+
+        const data = resp.body?.hits?.hits;
+        const count = resp.body?.hits?.total?.value ?? 0;
+        return {
+            data,
+            count,
+        };
+    }
+
+    async updateByIdElastic(id: string, createCommentDto: CreateCommentDto) {
+        const updatedComment = await this.commentModel.findByIdAndUpdate(id, createCommentDto);
+        if (updatedComment) {
+            const userObj = updatedComment.toObject();
+            ElasticSearchHelper.index(IndexNames.comment, userObj)
+        }
+        return await updatedComment
+    }
+
+    async remove(id: string) {
+        const user = await this.commentModel.findByIdAndDelete(id)
+        return await ElasticSearchHelper.remove(id, IndexNames.comment);
+    }
+
+
 
 }

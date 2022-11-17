@@ -5,6 +5,8 @@ import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateSkillsDto } from './dto/create-skills.dto';
 import { Skills, SkillsDocument } from './schema/skills.schema';
 import * as mongoose from 'mongoose';
+import { ElasticSearchHelper, IndexNames } from 'src/Helper/elastic.search.helper';
+import { SearchSkillsDto } from './dto/SearchSkills.dto';
 @Injectable()
 export class SkillsService {
     constructor(
@@ -18,6 +20,10 @@ export class SkillsService {
         if (user.userType == 'developer') {
             const userSkills = this.insertSkills(createSkillsDto, user);
             const Skills = await this.skillsModel.create(userSkills);
+            if (Skills) {
+                const userObj = Skills.toObject();
+                ElasticSearchHelper.index(IndexNames.skills, userObj)
+            }
 
             return Skills;
         } else {
@@ -89,6 +95,91 @@ export class SkillsService {
                 'you can not see skills!!You are not Developer'}
             );
         }
+    }
+
+
+    async getUsersFromElasticSearch(query: SearchSkillsDto) {
+        const pageSize = parseInt(query.pageSize ?? '200');
+        const current = parseInt(query.current ?? '1');
+        const searchFilters = {
+            query: {
+                bool: {
+                    must: [],
+                    filter: [],
+                },
+            },
+            size: pageSize,
+            from: ((current - 1) * pageSize) | 0,
+        };
+
+        if (query.search) {
+            let queryStr = ElasticSearchHelper.getFixedQueryString(query.search)
+            searchFilters.query.bool.must.push({
+                query_string: {
+                    // query: `\"*${query?.search}*\"`,
+                    query: queryStr,
+                    fields: ['fname', 'lname'],
+                },
+            });
+        }
+
+        delete query.search;
+        delete query.current;
+        delete query.search;
+        delete query.pageSize;
+
+        let queryString = '';
+        const queryKeys = Object.keys(query);
+        for (let i = 0; i < queryKeys.length; i++) {
+            const splittedParts = (
+                '"' +
+                query[queryKeys[i]].split(',').join('" , "') +
+                '"'
+            )
+                .split(',')
+                .join(' OR ');
+
+            queryString += `${queryKeys[i]}:(${splittedParts})`;
+
+            if (i < queryKeys.length - 1) {
+                queryString += ' AND ';
+            }
+        }
+
+        if (queryString != '') {
+
+            searchFilters.query.bool.must.push({
+                query_string: {
+                    query: queryString,
+                },
+            });
+        }
+
+        const resp = await ElasticSearchHelper.search(
+            IndexNames.skills,
+            searchFilters,
+        );
+
+        const data = resp.body?.hits?.hits;
+        const count = resp.body?.hits?.total?.value ?? 0;
+        return {
+            data,
+            count,
+        };
+    }
+
+    async updateByIdElastic(id: string, createSkillsDto: CreateSkillsDto) {
+        const updatedSkills = await this.skillsModel.findByIdAndUpdate(id, createSkillsDto);
+        if (updatedSkills) {
+            const userObj = updatedSkills.toObject();
+            ElasticSearchHelper.index(IndexNames.skills, userObj)
+        }
+        return await updatedSkills
+    }
+
+    async remove(id: string) {
+        const user = await this.skillsModel.findByIdAndDelete(id)
+        return await  ElasticSearchHelper.remove(id, IndexNames.skills);
     }
 
 

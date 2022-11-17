@@ -23,6 +23,7 @@ export class UserService {
   ) { }
 
   async createUser(createUserDto: CreateUserDto) {
+
     const existingUser = await this.userModel.findOne({ email: createUserDto.email });
     if (!existingUser) {
       const createdUser = await this.insertUser(createUserDto);
@@ -168,25 +169,24 @@ export class UserService {
 
     const data = resp.body?.hits?.hits;
     const count = resp.body?.hits?.total?.value ?? 0;
-    return {
+    return  {
       data,
       count,
     };
   }
 
   async updateById(id: string, createUserDto: CreateUserDto) {
-
-    const createdUser = await this.insertUser(createUserDto);
-    if (createdUser) {
-      const userObj = createdUser.toObject();
+    const updatedUser = await this.userModel.findByIdAndUpdate(id, createUserDto);
+    if (updatedUser) {
+      const userObj = updatedUser.toObject();
       ElasticSearchHelper.index(IndexNames.USER, userObj)
     }
-    return this.userModel.findByIdAndUpdate(id, createUserDto);
- }
+    return await updatedUser
+  }
 
   async remove(id: string) {
-    return ElasticSearchHelper.remove(id, IndexNames.USER);
-   
+    const user = await this.userModel.findByIdAndDelete(id)
+    return await ElasticSearchHelper.remove(id, IndexNames.USER);
   }
 
 }

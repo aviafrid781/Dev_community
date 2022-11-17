@@ -1,10 +1,11 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model } from 'mongoose';
+import { ElasticSearchHelper, IndexNames } from 'src/Helper/elastic.search.helper';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { Experience, ExperienceDocument } from './schema/experience.schema';
-import * as mongoose from 'mongoose';
+import { SearchExperienceDto } from './schema/searchExperience.dto';
 @Injectable()
 export class ExperienceService {
     constructor(
@@ -20,13 +21,17 @@ export class ExperienceService {
         this.logger.log(user);
         if (user.userType == 'developer') {
             const experience = this.insertExperience(createPostDto, user);
+
             if (createPostDto.totalYear >= 0 && createPostDto.totalYear <= 10) {
                 const createdExperience = await this.experienceModel.create(experience);
-
+                if (createdExperience) {
+                    const userObj = createdExperience.toObject();
+                    ElasticSearchHelper.index(IndexNames.experience, userObj)
+                }
                 return createdExperience;
             }
             else {
-                throw new UnauthorizedException({ massage: 'please give a review range between  >= 1 and <= 5' });
+                throw new UnauthorizedException({ massage: 'please give a experience range between  >= 1 and <= 5' });
             }
         }
         else {
@@ -37,11 +42,11 @@ export class ExperienceService {
         }
     }
 
-    private insertExperience(createPostDto: CreateExperienceDto, user: UserI): { companyName: string; totalYear: string | number; stackName: string; userId: any; } {
+    private insertExperience(createExperienceDto: CreateExperienceDto, user: UserI): { companyName: string; totalYear: string | number; stackName: string; userId: any; } {
         return {
-            companyName: createPostDto.companyName ? createPostDto.companyName : "",
-            totalYear: createPostDto.totalYear ? createPostDto.totalYear : "",
-            stackName: createPostDto.stackName ? createPostDto.stackName : "",
+            companyName: createExperienceDto.companyName ? createExperienceDto.companyName : "",
+            totalYear: createExperienceDto.totalYear ? createExperienceDto.totalYear : "",
+            stackName: createExperienceDto.stackName ? createExperienceDto.stackName : "",
             userId: user._id ? user._id : "",
         };
     }
@@ -61,7 +66,7 @@ export class ExperienceService {
         }
     }
 
-    async getExperienceDeveloper(user: UserI){
+    async getExperienceDeveloper(user: UserI) {
         if (user.userType == 'developer') {
             const experience = await this.experienceModel
                 .find()
@@ -122,9 +127,89 @@ export class ExperienceService {
         }
     }
 
+    async getExperienceFromElasticSearch(query: SearchExperienceDto) {
+        const pageSize = parseInt(query.pageSize ?? '200');
+        const current = parseInt(query.current ?? '1');
+        const searchFilters = {
+            query: {
+                bool: {
+                    must: [],
+                    filter: [],
+                },
+            },
+            size: pageSize,
+            from: ((current - 1) * pageSize) | 0,
+        };
 
+        if (query.search) {
+            let queryStr = ElasticSearchHelper.getFixedQueryString(query.search)
+            searchFilters.query.bool.must.push({
+                query_string: {
+                    // query: `\"*${query?.search}*\"`,
+                    query: queryStr,
+                    fields: ['fname', 'lname'],
+                },
+            });
+        }
 
+        delete query.search;
+        delete query.current;
+        delete query.search;
+        delete query.pageSize;
 
+        let queryString = '';
+        const queryKeys = Object.keys(query);
+        for (let i = 0; i < queryKeys.length; i++) {
+            const splittedParts = (
+                '"' +
+                query[queryKeys[i]].split(',').join('" , "') +
+                '"'
+            )
+                .split(',')
+                .join(' OR ');
+
+            queryString += `${queryKeys[i]}:(${splittedParts})`;
+
+            if (i < queryKeys.length - 1) {
+                queryString += ' AND ';
+            }
+        }
+
+        if (queryString != '') {
+
+            searchFilters.query.bool.must.push({
+                query_string: {
+                    query: queryString,
+                },
+            });
+        }
+
+        const resp = await ElasticSearchHelper.search(
+            IndexNames.experience,
+            searchFilters,
+        );
+        const data = resp.body?.hits?.hits;
+        const count = resp.body?.hits?.total?.value ?? 0;
+        return {
+            data,
+            count,
+        };
+    }
+
+    async updateByIdElastic(id: string, createExperienceDto: CreateExperienceDto) {
+
+        const updateExperience = this.experienceModel.findByIdAndUpdate(id, createExperienceDto);
+        if (updateExperience) {
+            const userObj = (await updateExperience).toObject();
+
+            return await ElasticSearchHelper.index(IndexNames.experience, userObj)
+        }
+    }
+
+    async remove(id: string) {
+        const user = await this.experienceModel.findByIdAndDelete(id)
+        return ElasticSearchHelper.remove(id, IndexNames.experience);
+    }
 
 
 }

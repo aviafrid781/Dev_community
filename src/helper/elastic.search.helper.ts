@@ -1,7 +1,8 @@
 import { Client } from '@opensearch-project/opensearch';
 import { identity } from 'rxjs';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { env } from 'process';
 const host = 'localhost:9200';
-// const host = 'localhost:5601';
 const protocol = 'https';
 const url = protocol + '://' + host;
 const client = new Client({
@@ -18,6 +19,10 @@ const client = new Client({
 export enum IndexNames {
     USER = 'user',
     COMPANY = 'company',
+    experience = 'experience',
+    skills='skills',
+    post='post',
+    comment='comment'
 }
 
 const dummyResponse = {
@@ -51,6 +56,7 @@ export class ElasticSearchHelper {
         )
         return remove;
     }
+
     static async index(indexName: IndexNames, object: any) {
         const id = object['_id'].toString()
         object['id'] = object['_id']
@@ -74,7 +80,7 @@ export class ElasticSearchHelper {
             const response = await client.search({
                 index: `${indexName}`,
                 body: query,
-                // filter_path: ['hits.hits._source']
+                 filter_path: ['hits.hits._source']
             });
 
             return response;

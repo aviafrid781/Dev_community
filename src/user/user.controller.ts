@@ -40,14 +40,14 @@ export class UserController {
     return await this.userService.getUsersFromElasticSearch(queries);
   }
 
-  @Put(':id')
-  updateById(@Param('id') id: string, @Body('') createUserDto:CreateUserDto ) {
-    return this.userService.updateById(id, createUserDto);
+  @Put('elastic:id')
+  async updateById(@Param('id') id: string, @Body('') createUserDto:CreateUserDto ) {
+    return await this.userService.updateById(id, createUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  @Delete('elastic/:id')
+  async remove(@Param('id') id: string) {
+    return await  this.userService.remove(id);
   }
 
 

@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { ExperienceService } from './experience.service';
 import { ExperienceDocument } from './schema/experience.schema';
+import { SearchExperienceDto } from './schema/searchExperience.dto';
 
 @Controller('experience')
 export class ExperienceController {
@@ -31,6 +32,21 @@ export class ExperienceController {
     @UseGuards(AuthGuard('jwt'))
     getExperience(@GetUser() user: UserI, @Query('page') page: number, @Query('count') count: number) {
         return this.experienceService.getExperience(user, page, count);
+    }
+
+    @Get('elastic')
+    async getExperienceFromElasticSearch(@Query() queries: SearchExperienceDto): Promise<{ data: any; count: any; }> {
+        return await this.experienceService.getExperienceFromElasticSearch(queries);
+    }
+
+    @Put('elastic/:id')
+     async updateByIdElastic(@Param('id') id: string, @Body('') createExperienceDto: CreateExperienceDto) {
+        return await this.experienceService.updateByIdElastic(id, createExperienceDto);
+    }
+
+    @Delete('elastic/:id')
+    async   remove(@Param('id') id: string) {
+        return await this.experienceService.remove(id);
     }
 
 }

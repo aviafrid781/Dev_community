@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/user/get-user.decorator';
 import { UserI } from 'src/user/interfaces/user.interface';
 import { CreateSkillsDto } from './dto/create-skills.dto';
+import { SearchSkillsDto } from './dto/SearchSkills.dto';
 import { SkillsDocument } from './schema/skills.schema';
 import { SkillsService } from './skills.service';
 
@@ -32,4 +33,20 @@ export class SkillsController {
     getSkills(@GetUser() user: UserI, @Query('page') page: number, @Query('count') count: number) {
         return this.skillsService.getSkills(user, page, count);
     }
+
+    @Get('elastic')
+    async getUsersFromElasticSearch(@Query() queries: SearchSkillsDto): Promise<{ data: any; count: any; }> {
+        return await this.skillsService.getUsersFromElasticSearch(queries);
+    }
+
+    @Put('elastic/:id')
+    async updateByIdElastic(@Param('id') id: string, @Body('') createSkillsDto: CreateSkillsDto) {
+        return await this.skillsService.updateByIdElastic(id, createSkillsDto);
+    }
+
+    @Delete('elastic/:id')
+    async remove(@Param('id') id: string) {
+        return await this.skillsService.remove(id);
+    }
+
 }
