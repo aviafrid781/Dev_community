@@ -10,7 +10,7 @@ import { SearchUsersDto } from './dto/searchUser.dto';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserType } from './model/user.type.enum';
 import { User, UserDocument } from './schema/user.schema';
-import { ElasticsearchService } from '@nestjs/elasticsearch';
+
 @Injectable()
 export class UserService {
   ElasticsearchService: any;
@@ -28,10 +28,10 @@ export class UserService {
     if (!existingUser) {
       const createdUser = await this.insertUser(createUserDto);
 
-      if (createdUser) {
-        const userObj = createdUser.toObject();
-        ElasticSearchHelper.index(IndexNames.USER, userObj)
-      }
+      // if (createdUser) {
+      //   const userObj = createdUser.toObject();
+      //   ElasticSearchHelper.index(IndexNames.USER, userObj)
+      // }
 
       const { accessToken, refreshToken }: { accessToken: string; refreshToken: string; } = this.generateTokens(createUserDto);
       const userObj = this.removePassword(createdUser);

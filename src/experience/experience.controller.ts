@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/user/get-user.decorator';
-import { UserI } from 'src/user/interfaces/user.interface';
+import { GetUser } from '../user/get-user.decorator';
+import { UserI } from '../user/interfaces/user.interface';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { ExperienceService } from './experience.service';
 import { ExperienceDocument } from './schema/experience.schema';

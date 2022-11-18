@@ -1,8 +1,8 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model } from 'mongoose';
-import { ElasticSearchHelper, IndexNames } from 'src/Helper/elastic.search.helper';
-import { UserI } from 'src/user/interfaces/user.interface';
+import { ElasticSearchHelper, IndexNames } from '../Helper/elastic.search.helper';
+import { UserI } from '../user/interfaces/user.interface';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { Experience, ExperienceDocument } from './schema/experience.schema';
 import { SearchExperienceDto } from './schema/searchExperience.dto';
@@ -16,7 +16,7 @@ export class ExperienceService {
 
     async create(createPostDto: CreateExperienceDto
 
-        , user: UserI
+        , user
     ) {
         this.logger.log(user);
         if (user.userType == 'developer') {
@@ -24,10 +24,10 @@ export class ExperienceService {
 
             if (createPostDto.totalYear >= 0 && createPostDto.totalYear <= 10) {
                 const createdExperience = await this.experienceModel.create(experience);
-                if (createdExperience) {
-                    const userObj = createdExperience.toObject();
-                    ElasticSearchHelper.index(IndexNames.experience, userObj)
-                }
+                // if (createdExperience) {
+                //     const userObj = createdExperience.toObject();
+                //     ElasticSearchHelper.index(IndexNames.experience, userObj)
+                // }
                 return createdExperience;
             }
             else {

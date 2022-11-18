@@ -13,6 +13,7 @@ import { Experience, ExperienceSchema } from './schema/experience.schema';
     ,
   ],
   controllers: [ExperienceController],
-  providers: [ExperienceService, Logger]
+  providers: [ExperienceService, Logger],
+   exports: [ExperienceService],
 })
 export class ExperienceModule {}

@@ -1,11 +1,11 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model } from 'mongoose';
-import { UserI } from 'src/user/interfaces/user.interface';
+import { UserI } from '../user/interfaces/user.interface';
 import { CreateSkillsDto } from './dto/create-skills.dto';
 import { Skills, SkillsDocument } from './schema/skills.schema';
 import * as mongoose from 'mongoose';
-import { ElasticSearchHelper, IndexNames } from 'src/Helper/elastic.search.helper';
+import { ElasticSearchHelper, IndexNames } from '../Helper/elastic.search.helper';
 import { SearchSkillsDto } from './dto/SearchSkills.dto';
 @Injectable()
 export class SkillsService {
@@ -15,15 +15,15 @@ export class SkillsService {
         private readonly logger: Logger,
     ) { }
 
-    async create(createSkillsDto: CreateSkillsDto, user: UserI)
+    async createSkills(createSkillsDto: CreateSkillsDto, user): Promise<Document<any, any, any> & { _id: mongoose.Types.ObjectId; }>
     {
         if (user.userType == 'developer') {
             const userSkills = this.insertSkills(createSkillsDto, user);
             const Skills = await this.skillsModel.create(userSkills);
-            if (Skills) {
-                const userObj = Skills.toObject();
-                ElasticSearchHelper.index(IndexNames.skills, userObj)
-            }
+            // if (Skills) {
+            //     const userObj = Skills.toObject();
+            //     ElasticSearchHelper.index(IndexNames.skills, userObj)
+            // }
 
             return Skills;
         } else {
@@ -54,6 +54,7 @@ export class SkillsService {
             );
         }
     }
+    
     async getSkills(user: UserI, page: number, count: number): Promise<{ data: any[]; count: any; }> {
 
         if (user.userType == 'developer') {

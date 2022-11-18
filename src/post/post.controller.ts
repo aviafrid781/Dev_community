@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/user/get-user.decorator';
-import { UserI } from 'src/user/interfaces/user.interface';
+import { GetUser } from '../user/get-user.decorator';
+import { UserI } from '../user/interfaces/user.interface';
 import { CreatePostDto } from './dto/create-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { PostService } from './post.service';

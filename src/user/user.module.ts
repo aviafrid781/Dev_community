@@ -23,6 +23,6 @@ import { RefreshTokenStrategy } from './refreshToken.strategy';
 
   controllers: [UserController],
   providers: [UserService, jwtStrategy,RefreshTokenStrategy, Logger],
-  exports: [jwtStrategy,RefreshTokenStrategy, MongooseModule],
+  exports: [jwtStrategy,RefreshTokenStrategy, MongooseModule,UserService],
 })
 export class UserModule {}

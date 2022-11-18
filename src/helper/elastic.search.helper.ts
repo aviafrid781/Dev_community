@@ -11,7 +11,7 @@ const client = new Client({
         username: 'admin',
         password: 'admin',
     },
-    ssl: {
+     ssl: {
         rejectUnauthorized: false,
     },
 });

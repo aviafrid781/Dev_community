@@ -1,12 +1,12 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model } from 'mongoose';
-import { UserI } from 'src/user/interfaces/user.interface';
+import { UserI } from '../user/interfaces/user.interface';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Posts } from './schema/post.schema';
 import * as mongoose from 'mongoose';
 import { SearchPostDto } from './dto/search-post.dto';
-import { ElasticSearchHelper, IndexNames } from 'src/Helper/elastic.search.helper';
+import { ElasticSearchHelper, IndexNames } from '../Helper/elastic.search.helper';
 @Injectable()
 export class PostService {
   constructor(
@@ -17,17 +17,17 @@ export class PostService {
 
   async create(createPostDto: CreatePostDto
 
-    , user: UserI
+    , user
   ): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }> {
     this.logger.log(user);
     if (user.userType == 'developer') {
       const post = this.insertPost(createPostDto, user);
       const createPost = await this.postModel.create(post);
       
-      if (createPost) {
-        const userObj = createPost.toObject();
-        ElasticSearchHelper.index(IndexNames.post, userObj)
-      }
+      // if (createPost) {
+      //   const userObj = createPost.toObject();
+      //   ElasticSearchHelper.index(IndexNames.post, userObj)
+      // }
 
       return createPost;
     } else {

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GetUser } from 'src/user/get-user.decorator';
-import { UserI } from 'src/user/interfaces/user.interface';
+import { GetUser } from '../user/get-user.decorator';
+import { UserI } from '../user/interfaces/user.interface';
 import { CreateSkillsDto } from './dto/create-skills.dto';
 import { SearchSkillsDto } from './dto/SearchSkills.dto';
 import { SkillsDocument } from './schema/skills.schema';
@@ -13,10 +13,10 @@ export class SkillsController {
 
     @Post()
     @UseGuards(AuthGuard('jwt'))
-    async create(
+    async createSkills(
         @Body() createSkillsDto: CreateSkillsDto, @GetUser() user: UserI,
     ) {
-        return await this.skillsService.create(
+        return await this.skillsService.createSkills(
             createSkillsDto,
             user
         );

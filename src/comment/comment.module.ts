@@ -13,6 +13,7 @@ import { Comment, CommentSchema } from './schema/comment.schema';
     ,
   ],
   controllers: [CommentController],
-  providers: [CommentService, Logger]
+  providers: [CommentService, Logger],
+  exports: [CommentService]
 })
 export class CommentModule {}

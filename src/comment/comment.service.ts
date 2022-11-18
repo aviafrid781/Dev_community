@@ -2,8 +2,8 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Document, Model } from 'mongoose';
-import { ElasticSearchHelper, IndexNames } from 'src/Helper/elastic.search.helper';
-import { UserI } from 'src/user/interfaces/user.interface';
+import { ElasticSearchHelper, IndexNames } from '../Helper/elastic.search.helper';
+import { UserI } from '../user/interfaces/user.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { SearchCommentDto } from './dto/search-comment.dto';
 import { Comment } from './schema/comment.schema';
@@ -16,7 +16,7 @@ export class CommentService {
     ) { }
 
     async create(createCommentDto: CreateCommentDto
-        , user: UserI
+        , user
     ): Promise<mongoose.Document<unknown, any, Document> & Document & { _id: import("mongoose").Types.ObjectId; }> {
         if (user.userType == 'developer') {
             const comment = this.insertComment(createCommentDto, user);

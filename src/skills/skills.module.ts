@@ -14,6 +14,7 @@ import { SkillsService } from './skills.service';
    ,
   ],
   controllers: [SkillsController],
-  providers: [SkillsService, Logger]
+  providers: [SkillsService, Logger],
+  exports: [SkillsService,]
 })
 export class SkillsModule {}

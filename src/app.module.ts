@@ -28,5 +28,6 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch/dist/elasticsearch.mo
   ],
   controllers: [AppController],
   providers: [AppService],
+
 })
 export class AppModule {}
