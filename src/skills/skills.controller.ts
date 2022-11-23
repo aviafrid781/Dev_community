@@ -4,7 +4,6 @@ import { GetUser } from '../user/get-user.decorator';
 import { UserI } from '../user/interfaces/user.interface';
 import { CreateSkillsDto } from './dto/create-skills.dto';
 import { SearchSkillsDto } from './dto/SearchSkills.dto';
-import { SkillsDocument } from './schema/skills.schema';
 import { SkillsService } from './skills.service';
 
 @Controller('skills')

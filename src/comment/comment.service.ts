@@ -160,7 +160,6 @@ export class CommentService {
                 queryString += ' AND ';
             }
         }
-
         if (queryString != '') {
 
             searchFilters.query.bool.must.push({
@@ -169,7 +168,6 @@ export class CommentService {
                 },
             });
         }
-
         const resp = await ElasticSearchHelper.search(
             IndexNames.comment,
             searchFilters,
@@ -182,7 +180,6 @@ export class CommentService {
             count,
         };
     }
-
     async updateByIdElastic(id: string, createCommentDto: CreateCommentDto) {
         const updatedComment = await this.commentModel.findByIdAndUpdate(id, createCommentDto);
         if (updatedComment) {
