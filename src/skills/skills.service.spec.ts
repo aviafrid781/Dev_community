@@ -1,37 +1,38 @@
 import { Logger } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import console from 'console';
 import { AppModule } from '../app.module';
+import { CreateSkillsDto } from './dto/create-skills.dto';
 import { Skills, SkillsSchema } from './schema/skills.schema';
 import { SkillsService } from './skills.service';
 
-const mockSkills = {
 
+const mockTasksService = () => ({
+  findByIdAndUpdate: jest.fn(),
+});
+
+const mockUser = {
+  "_id": "6371d6952c18a939b245fe58",
+  "fname": "john",
+  "lname": "doe",
+  "email": "J.Doe@gmail.com",
+  "address": "dhaka",
+  "userType": "developer",
+}
+const mockSkills = {
   "skillsName": "java",
   "expertise": "javascript",
-  "userId": "6371d6952c18a939b245fe58",
-  "userType": "developer"
-}
-const mockUser = {
-
-    "_id": "6371d6952c18a939b245fe58",
-    "fname": "john",
-    "lname": "doe",
-    "email": "J.Doe@gmail.com",
-    "address": "dhaka",
-    "userType": "developer",
-    "created_at": "2022-11-14T05:48:05.396Z",
-    "updated_at": "2022-11-14T05:48:05.396Z",
-    "__v": 0
+  "userId": "63709b50c09fb6a7c940bda0",
 }
 
-describe('SkillsService',  () => {
+describe('SkillsService', () => {
   let service: SkillsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
 
-      providers: [SkillsService, Logger],
+      providers: [Logger, SkillsService],
       imports: [
         MongooseModule.forFeature([
           { name: Skills.name, schema: SkillsSchema },
@@ -44,23 +45,33 @@ describe('SkillsService',  () => {
 
     service = module.get<SkillsService>(SkillsService);
   })
-  
+
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe("get createSkills function", () => {
+  describe("createSkills", () => {
     it('should be defined', async () => {
-
-      const result = await service.createSkills(mockSkills, mockUser)  
-      console.log(result);
+      const result = await service.createSkills(mockSkills, mockUser)
+      //console.log(result);
       expect(result).toEqual(expect.any(Object))
+    });
+  });
+  const createSkillsDto={
+    "skillsName": "java77776666",
+    "expertise": "javascript",
+    "userId": "63709b50c09fb6a7c940bda0",
+  }
+ 
+  describe('updateById', () => {
+    it('update skills by id', async () => {
+      const results = await service.updateById("63709b50c09fb6a7c940bda0", createSkillsDto , mockUser);
+    
+      await expect(results).toEqual(expect.any(Object))
 
     });
- 
   });
-
 
 
 });

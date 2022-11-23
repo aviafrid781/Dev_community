@@ -1,5 +1,5 @@
 import { Document } from 'mongoose';
-export interface PostI extends Document {
+export interface ExperienceI extends Document {
     companyName: string;
     totalYear: Number;
     stackName: string;

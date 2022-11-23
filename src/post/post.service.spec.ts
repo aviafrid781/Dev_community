@@ -49,18 +49,13 @@ describe('PostService', () => {
     expect(service).toBeDefined();
   });
 
-  describe("get createSkills function", () => {
+  describe("create", () => {
     it('should be defined', async () => {
-
       const result = await service.create(post,User)
       console.log(result);
       expect(result).toEqual(expect.any(Object))
-
     });
 
   });
-
-
-
 
 });

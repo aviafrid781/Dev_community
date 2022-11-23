@@ -15,7 +15,7 @@ import { RefreshTokenStrategy } from './refreshToken.strategy';
     JwtModule.register({
       secret: 'topSecret51',
       signOptions: {
-        expiresIn: 3600,
+        expiresIn: '1d',
       },
     }),
     UserModule,

@@ -24,8 +24,8 @@ export class SkillsController {
 
     @Put(':id')
     @UseGuards(AuthGuard('jwt'))
-    updateById(@Param('id') id: string, @Body('') SkillsDocument: SkillsDocument, @GetUser() user: UserI) {
-        return this.skillsService.updateById(id, SkillsDocument,user);
+    updateById(@Param('id') id: string, @Body('') createSkillsDto: CreateSkillsDto, @GetUser() user: UserI) {
+        return this.skillsService.updateById(id, createSkillsDto,user);
     }
     
     @Get()

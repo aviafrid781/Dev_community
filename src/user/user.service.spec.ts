@@ -42,7 +42,7 @@ describe('UserService', () => {
   });
 
 
-  describe("get createUser function", () => {
+  describe("createUser", () => {
     it('Testing create user', async () => {  
      
       const result = await service.createUser(user);

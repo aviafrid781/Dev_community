@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model } from 'mongoose';
 import { ElasticSearchHelper, IndexNames } from '../Helper/elastic.search.helper';
@@ -15,10 +15,9 @@ export class ExperienceService {
     ) { }
 
     async create(createPostDto: CreateExperienceDto
-
         , user
     ) {
-        this.logger.log(user);
+       
         if (user.userType == 'developer') {
             const experience = this.insertExperience(createPostDto, user);
 
@@ -51,10 +50,10 @@ export class ExperienceService {
         };
     }
 
-    async updateById(id: string, experienceDocument: ExperienceDocument, user: UserI) {
+    async updateById(id: string, createExperienceDto: CreateExperienceDto, user): Promise<Document<any, any, any> & { _id: import("mongoose").Types.ObjectId; }> {
 
         if (user.userType == 'developer') {
-            return this.experienceModel.findByIdAndUpdate(id, experienceDocument);
+            return this.experienceModel.findByIdAndUpdate(id, createExperienceDto);
         }
         else {
 
@@ -64,6 +63,16 @@ export class ExperienceService {
             }
             );
         }
+    }
+
+    async getExperienceById(id: string){
+        const found = await this.experienceModel.findById( id);
+
+        if (!found) {
+            throw new NotFoundException(`Task with ID "${id}" not found`);
+        }
+
+        return found;
     }
 
     async getExperienceDeveloper(user: UserI) {

@@ -9,6 +9,7 @@ import { ElasticSearchHelper, IndexNames } from '../Helper/elastic.search.helper
 import { SearchSkillsDto } from './dto/SearchSkills.dto';
 @Injectable()
 export class SkillsService {
+  
     constructor(
         @InjectModel(Skills.name)
         private skillsModel: Model<Document>,
@@ -41,10 +42,10 @@ export class SkillsService {
         };
     }
 
-    async updateById(id: string, skillsDocument: SkillsDocument, user: UserI) {
+    async updateById(id: string, createSkillsDto: CreateSkillsDto, user){
 
         if (user.userType == 'developer') {
-            return this.skillsModel.findByIdAndUpdate(id, skillsDocument);
+            return this.skillsModel.findByIdAndUpdate(id, createSkillsDto);
         }
         else {
 
@@ -97,6 +98,8 @@ export class SkillsService {
             );
         }
     }
+
+
 
 
     async getUsersFromElasticSearch(query: SearchSkillsDto) {
