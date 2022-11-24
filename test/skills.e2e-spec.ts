@@ -5,10 +5,11 @@ import { AppModule } from '../src/app.module';
 import { SkillsService } from '../src/skills/skills.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Skills, SkillsSchema } from '../src/skills/schema/skills.schema';
-import { SkillsController } from 'src/skills/skills.controller';
+import { SkillsController } from './../src/skills/skills.controller';
+import { SkillsModule } from 'src/skills/skills.module';
 
 
-describe('AppController (e2e)', () => {
+describe('SkillsController (e2e)', () => {
     let app: INestApplication;
 
     beforeEach(async () => {
@@ -20,18 +21,25 @@ describe('AppController (e2e)', () => {
                     { name: Skills.name, schema: SkillsSchema },
                 ]),
                 AppModule
+
             ],
             exports: [SkillsService,]
         }).compile();
 
         app = moduleFixture.createNestApplication();
+        app.setGlobalPrefix('api');
         await app.init();
     });
 
-    it('/skills (GET)', () => {
+    it('should create new user', () => {
         return request(app.getHttpServer())
-            .get('/skills')
-            .expect(200)
-            .expect('');
+            .post('/skills/skills')
+            .send({
+                "skillsName": "java bbbb",
+                "expertise": "fdgfg",
+                "userId": "6371d6952c18a939b245fe58",
+            })
+            .expect(404)
+            
     });
 });
